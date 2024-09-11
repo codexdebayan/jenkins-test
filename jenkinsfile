@@ -1,3 +1,85 @@
+// pipeline {
+//     agent any
+
+//     stages {
+//         stage('Checkout') {
+//             steps {
+//                 // Checkout the code from your repository
+//                 checkout scm
+//             }
+//         }
+
+//         stage('Set Up Docker') {
+//             steps {
+//                 script {
+//                     try {
+//                         // Pull the base Python image
+//                         sh 'docker pull python:3.9-slim'
+                        
+//                         // Build the Docker image using the Dockerfile in the project directory
+//                         sh 'docker build -t calculator-app .'
+//                     } catch (Exception e) {
+//                         error "Failed to set up Docker: ${e.message}"
+//                     }
+//                 }
+//             }
+//         }
+
+//         stage('Install Dependencies') {
+//             steps {
+//                 script {
+//                     try {
+//                         // Run the Docker container to install dependencies
+//                         sh 'docker run --rm -v $(pwd):/app -w /app python:3.9-slim pip install -r requirements.txt'
+//                     } catch (Exception e) {
+//                         error "Failed to install dependencies: ${e.message}"
+//                     }
+//                 }
+//             }
+//         }
+
+//         stage('Run Unit Tests') {
+//             steps {
+//                 script {
+//                     try {
+//                         // Run the unit tests inside the Docker container
+//                         sh 'docker run --rm -v $(pwd):/app -w /app calculator-app python -m pytest tests/test_calculator.py'
+//                     } catch (Exception e) {
+//                         error "Failed to run unit tests: ${e.message}"
+//                     }
+//                 }
+//             }
+//         }
+
+//         stage('Run Application') {
+//             steps {
+//                 script {
+//                     try {
+//                         // Run the Docker container to execute the calculator application with arguments (e.g., add 5 3)
+//                         sh 'docker run --rm -v $(pwd):/app -w /app calculator-app python app.py add 5 3'
+//                     } catch (Exception e) {
+//                         error "Failed to run application: ${e.message}"
+//                     }
+//                 }
+//             }
+//         }
+
+//         stage('Clean Up') {
+//             steps {
+//                 script {
+//                     try {
+//                         // Optionally remove the Docker image after the pipeline completes
+//                         sh 'docker rmi calculator-app || true'
+//                     } catch (Exception e) {
+//                         error "Failed to clean up Docker image: ${e.message}"
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
 pipeline {
     agent any
 
@@ -12,67 +94,17 @@ pipeline {
         stage('Set Up Docker') {
             steps {
                 script {
-                    try {
-                        // Pull the base Python image
-                        sh 'docker pull python:3.9-slim'
-                        
-                        // Build the Docker image using the Dockerfile in the project directory
-                        sh 'docker build -t calculator-app .'
-                    } catch (Exception e) {
-                        error "Failed to set up Docker: ${e.message}"
-                    }
+                    // Pull the base Python image
+                    sh 'docker pull python:3.9-slim'
                 }
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Run a Simple Command') {
             steps {
                 script {
-                    try {
-                        // Run the Docker container to install dependencies
-                        sh 'docker run --rm -v $(pwd):/app -w /app python:3.9-slim pip install -r requirements.txt'
-                    } catch (Exception e) {
-                        error "Failed to install dependencies: ${e.message}"
-                    }
-                }
-            }
-        }
-
-        stage('Run Unit Tests') {
-            steps {
-                script {
-                    try {
-                        // Run the unit tests inside the Docker container
-                        sh 'docker run --rm -v $(pwd):/app -w /app calculator-app python -m pytest tests/test_calculator.py'
-                    } catch (Exception e) {
-                        error "Failed to run unit tests: ${e.message}"
-                    }
-                }
-            }
-        }
-
-        stage('Run Application') {
-            steps {
-                script {
-                    try {
-                        // Run the Docker container to execute the calculator application with arguments (e.g., add 5 3)
-                        sh 'docker run --rm -v $(pwd):/app -w /app calculator-app python app.py add 5 3'
-                    } catch (Exception e) {
-                        error "Failed to run application: ${e.message}"
-                    }
-                }
-            }
-        }
-
-        stage('Clean Up') {
-            steps {
-                script {
-                    try {
-                        // Optionally remove the Docker image after the pipeline completes
-                        sh 'docker rmi calculator-app || true'
-                    } catch (Exception e) {
-                        error "Failed to clean up Docker image: ${e.message}"
-                    }
+                    // Run a simple command to verify Docker setup
+                    sh 'docker run --rm python:3.9-slim python -c "print(\'Hello from Docker!\')"'
                 }
             }
         }
