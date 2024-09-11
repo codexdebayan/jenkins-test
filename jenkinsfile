@@ -1,77 +1,15 @@
-// pipeline {
-//     agent {
-//         docker {
-//             image 'python:3.9-slim'  // Use the official Python image
-//             args '-v /var/run/docker.sock:/var/run/docker.sock -w /app'  // Set the working directory and allow Docker commands
-//         }
-//     }
-
-//     stages {
-//         stage('Checkout') {
-//             steps {
-//                 // Checkout the code from your repository
-//                 checkout scm
-//             }
-//         }
-
-//         stage('Install Dependencies') {
-//             steps {
-//                 script {
-//                     // Install the dependencies listed in the requirements.txt
-//                     sh 'pip install -r requirements.txt'
-//                 }
-//             }
-//         }
-
-//         stage('Build Docker Image') {
-//             steps {
-//                 script {
-//                     // Build the Docker image using the Dockerfile in the project directory
-//                     docker.build('calculator-app', '-f dockerfile .')
-//                 }
-//             }
-//         }
-
-//         stage('Run Unit Tests') {
-//             steps {
-//                 script {
-//                     // Run the unit tests inside the Docker container
-//                     docker.image('calculator-app').inside {
-//                         sh 'python -m pytest  test_calculator.py'
-//                     }
-//                 }
-//             }
-//         }
-
-//         stage('Run Application') {
-//             steps {
-//                 script {
-//                     // Run the Docker container to execute the calculator application with arguments (e.g., add 5 3)
-//                     docker.image('calculator-app').inside {
-//                         sh 'python app.py add 5 3'
-//                     }
-//                 }
-//             }
-//         }
-
-//         stage('Clean Up') {
-//             steps {
-//                 script {
-//                     // Optionally remove the Docker image after the pipeline completes
-//                     sh 'docker rmi calculator-app || true'
-//                 }
-//             }
-//         }
-//     }
-// }
-
-
 pipeline {
-    agent any
-    
+    agent {
+        docker {
+            image 'python:3.9-slim'  // Use the official Python image
+            args '-v /var/run/docker.sock:/var/run/docker.sock -w /app'  // Set the working directory and allow Docker commands
+        }
+    }
+
     stages {
         stage('Checkout') {
             steps {
+                // Checkout the code from your repository
                 checkout scm
             }
         }
@@ -79,25 +17,48 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Run pip install to set up dependencies
-                    if (isUnix()) {
-                        sh 'pip install -r requirements.txt'
-                    } else {
-                        bat 'pip install -r requirements.txt'
+                    // Install the dependencies listed in the requirements.txt
+                    sh 'pip install -r requirements.txt'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image using the Dockerfile in the project directory
+                    sh 'docker build -t calculator-app .'
+                }
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                script {
+                    // Run the unit tests inside the Docker container
+                    docker.image('calculator-app').inside {
+                        sh 'python -m pytest tests/test_calculator.py'
                     }
                 }
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Application') {
             steps {
                 script {
-                    // Run the unit tests directly on the host
-                    if (isUnix()) {
-                        sh 'python -m unittest discover tests'
-                    } else {
-                        bat 'python -m unittest discover tests'
+                    // Run the Docker container to execute the calculator application with arguments (e.g., add 5 3)
+                    docker.image('calculator-app').inside {
+                        sh 'python app.py add 5 3'
                     }
+                }
+            }
+        }
+
+        stage('Clean Up') {
+            steps {
+                script {
+                    // Optionally remove the Docker image after the pipeline completes
+                    sh 'docker rmi calculator-app || true'
                 }
             }
         }
