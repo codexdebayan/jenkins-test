@@ -48,7 +48,7 @@ pipeline {
                 script {
                     // Run the Docker container to execute the calculator application with arguments (e.g., add 5 3)
                     docker.image('calculator-app').inside {
-                        sh 'python src/calculator.py add 5 3'
+                        sh 'python app.py add 5 3'
                     }
                 }
             }
