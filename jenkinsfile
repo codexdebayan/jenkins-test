@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.9-slim' // Pull the base Python image from Docker Hub
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // Give the agent access to Docker
+            image 'python:3.9-slim'  // Use the official Python image
+            args '-v /var/run/docker.sock:/var/run/docker.sock -w /app'  // Set working directory inside the container
         }
     }
     stages {
@@ -15,6 +15,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image using the Dockerfile in the project directory
                     dockerImage = docker.build("my-python-app")
                 }
             }
@@ -22,7 +23,9 @@ pipeline {
         stage('Run Application') {
             steps {
                 script {
+                    // Run the application inside the built Docker container
                     dockerImage.inside {
+                        // Make sure to use the correct path for Windows environment
                         sh 'python app.py'
                     }
                 }
@@ -31,7 +34,7 @@ pipeline {
     }
     post {
         always {
-            // Clean up Docker resources
+            // Clean up Docker resources after the pipeline finishes
             sh 'docker system prune -f'
         }
     }
