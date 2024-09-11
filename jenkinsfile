@@ -1,0 +1,38 @@
+pipeline {
+    agent {
+        docker {
+            image 'python:3.9-slim' // Pull the base Python image from Docker Hub
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // Give the agent access to Docker
+        }
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout your code from the repository
+                checkout scm
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("my-python-app")
+                }
+            }
+        }
+        stage('Run Application') {
+            steps {
+                script {
+                    dockerImage.inside {
+                        sh 'python app.py'
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            // Clean up Docker resources
+            sh 'docker system prune -f'
+        }
+    }
+}
