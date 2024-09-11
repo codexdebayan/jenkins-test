@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'python:3.9-slim' // Pull the base Python image from Docker Hub
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // Give the agent access to Docker
+            // args '-v /var/run/docker.sock:/var/run/docker.sock' // Give the agent access to Docker
         }
     }
     stages {
