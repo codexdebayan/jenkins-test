@@ -1,58 +1,39 @@
-// pipeline {
-//     agent {
-//         docker {
-//             image 'python:3.9-slim' // Pull the base Python image from Docker Hub
-//             args '-v /var/run/docker.sock:/var/run/docker.sock' // Give the agent access to Docker
-//         }
-//     }
-//     stages {
-//         stage('Checkout') {
-//             steps {
-//                 // Checkout your code from the repository
-//                 checkout scm
-//             }
-//         }
-//         stage('Build Docker Image') {
-//             steps {
-//                 script {
-//                     dockerImage = docker.build("my-python-app")
-//                 }
-//             }
-//         }
-//         stage('Run Application') {
-//             steps {
-//                 script {
-//                     dockerImage.inside {
-//                         'python app.py'
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     post {
-//         always {
-//             // Clean up Docker resources
-//             'docker system prune -f'
-//         }
-//     }
-// }
-
-stage("Python Test") {
-  agent { 
-    docker {
-      label "docker && linux" 
-      image "python:3.7"
+pipeline {
+    agent {
+        docker {
+            image 'python:3.9-slim' // Pull the base Python image from Docker Hub
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // Give the agent access to Docker
+        }
     }
-  }
-  steps {
-    withEnv(["HOME=${env.WORKSPACE}"]) {
-      sh "pip install -r requirements.txt --user"
-      # python stuff
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout your code from the repository
+                checkout scm
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("my-python-app")
+                }
+            }
+        }
+        stage('Run Application') {
+            steps {
+                script {
+                    dockerImage.inside {
+                        'python app.py'
+                    }
+                }
+            }
+        }
     }
-  }
-  post {
-    cleanup {
-      cleanWs()
+    post {
+        always {
+            // Clean up Docker resources
+            'docker system prune -f'
+        }
     }
-  }
 }
+
