@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.9-slim' // Pull the base Python image from Docker Hub
-            args '-u root:sudo' // Give the agent access to Docker
-        }
-    }
+   agent any
     stages {
         stage('Checkout') {
             steps {
@@ -21,6 +16,11 @@ pipeline {
         }
         stage('Run Application') {
             steps {
+                agent {
+                    docker {
+                        image 'python:3.9-slim' // Pull the base Python image from Docker Hub
+                        }
+                    }
                 script {
                     dockerImage.inside {
                         'python app.py'
@@ -30,4 +30,3 @@ pipeline {
         }
     }
 }
-
