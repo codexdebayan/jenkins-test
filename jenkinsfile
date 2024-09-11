@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     dockerImage.inside {
-                        sh 'python app.py'
+                        bat 'python app.py'
                     }
                 }
             }
@@ -32,7 +32,7 @@ pipeline {
     post {
         always {
             // Clean up Docker resources
-            sh 'docker system prune -f'
+            bat 'docker system prune -f'
         }
     }
 }
