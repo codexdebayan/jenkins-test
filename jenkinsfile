@@ -1,5 +1,6 @@
 pipeline {
-   agent any
+    agent any
+
     stages {
         stage('Checkout') {
             steps {
@@ -7,23 +8,22 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image with the tag "my-python-app"
                     dockerImage = docker.build("my-python-app")
                 }
             }
         }
+
         stage('Run Application') {
             steps {
-                agent {
-                    docker {
-                        image 'python:3.9-slim' // Pull the base Python image from Docker Hub
-                        }
-                    }
                 script {
+                    // Run the Docker container to execute the application
                     dockerImage.inside {
-                        'python app.py'
+                        sh 'python app.py'
                     }
                 }
             }
