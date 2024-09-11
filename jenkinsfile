@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'python:3.9-slim'  // Use the official Python image
-            args '-v /var/run/docker.sock:/var/run/docker.sock -w /app'  // Set the working directory and allow Docker commands
+            // args '-v /var/run/docker.sock:/var/run/docker.sock -w /app'  // Set the working directory and allow Docker commands
         }
     }
 
